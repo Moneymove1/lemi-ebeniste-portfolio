@@ -51,8 +51,8 @@ const IMG = {
   res15: "/portfolio/15.webp",
   res16: "/portfolio/16.webp",
   res17: "/portfolio/17.webp",
-  res18jpg: "/portfolio/18.webp",
-  res18png: "/portfolio/18.webp", // both were 18, so webp handles it
+  res18jpg: "/portfolio/18jpg.webp",
+  res18png: "/portfolio/18png.webp",
   res19: "/portfolio/19.webp",
   res20: "/portfolio/20.webp",
   res21: "/portfolio/21.webp",
