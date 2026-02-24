@@ -29,35 +29,35 @@ const C = {
 // ─── Local Images ────────────────────────────────────────────────
 const IMG = {
   // Hero
-  cuisineGrise: "/portfolio/1111.png",
+  cuisineGrise: "/portfolio/1111.webp",
 
   // ── COMMERCIAL (#1–#6) ──
-  comm1: "/portfolio/1left.png",
-  comm2: "/portfolio/2.png",
-  comm3: "/portfolio/3.png",
-  comm4: "/portfolio/4.png",
-  comm5: "/portfolio/5.png",
-  comm6: "/portfolio/6.png",
+  comm1: "/portfolio/1left.webp",
+  comm2: "/portfolio/2.webp",
+  comm3: "/portfolio/3.webp",
+  comm4: "/portfolio/4.webp",
+  comm5: "/portfolio/5.webp",
+  comm6: "/portfolio/6.webp",
 
   // ── RESIDENTIAL ──
-  res7: "/portfolio/7.png",
-  res8: "/portfolio/8.png",
-  res9: "/portfolio/9.png",
-  res10: "/portfolio/10.png",
-  res11: "/portfolio/11.png",
-  res12: "/portfolio/12.png",
-  res13: "/portfolio/13.png",
-  res14: "/portfolio/14.png",
-  res15: "/portfolio/15.png",
-  res16: "/portfolio/16.png",
-  res17: "/portfolio/17.jpg",
-  res18jpg: "/portfolio/18.jpg",
-  res18png: "/portfolio/18.png",
-  res19: "/portfolio/19.png",
-  res20: "/portfolio/20.png",
-  res21: "/portfolio/21.png",
-  res22: "/portfolio/22.png",
-  res23: "/portfolio/23.png",
+  res7: "/portfolio/7.webp",
+  res8: "/portfolio/8.webp",
+  res9: "/portfolio/9.webp",
+  res10: "/portfolio/10.webp",
+  res11: "/portfolio/11.webp",
+  res12: "/portfolio/12.webp",
+  res13: "/portfolio/13.webp",
+  res14: "/portfolio/14.webp",
+  res15: "/portfolio/15.webp",
+  res16: "/portfolio/16.webp",
+  res17: "/portfolio/17.webp",
+  res18jpg: "/portfolio/18.webp",
+  res18png: "/portfolio/18.webp", // both were 18, so webp handles it
+  res19: "/portfolio/19.webp",
+  res20: "/portfolio/20.webp",
+  res21: "/portfolio/21.webp",
+  res22: "/portfolio/22.webp",
+  res23: "/portfolio/23.webp",
 };
 
 /* ── Reveal on scroll with stagger ── */
@@ -94,22 +94,34 @@ function Reveal({ children, className = "", delay = 0, y = 30, style }: { childr
 function GalleryImage({ src, alt, aspect = "4/3", mobileAspect, className = "", objectPosition = "center" }: { src: string; alt: string; aspect?: string; mobileAspect?: string; className?: string; objectPosition?: string }) {
   const [loaded, setLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setLoaded(true);
+    }
+  }, [src]);
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
   const currentAspect = (isMobile && mobileAspect) ? mobileAspect : aspect;
+
   return (
     <div
       className={`overflow-hidden group ${className}`}
       style={{ aspectRatio: currentAspect, backgroundColor: C.lineLight }}
     >
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         loading="lazy"
+        decoding="async"
         onLoad={() => setLoaded(true)}
         className="w-full h-full object-cover transition-all duration-[1.2s] ease-out group-hover:scale-[1.04]"
         style={{ opacity: loaded ? 1 : 0, objectPosition }}
@@ -323,6 +335,8 @@ function Hero() {
             <img
               src={IMG.cuisineGrise}
               alt="Cuisine sur mesure — Maître Ébéniste"
+              fetchPriority="high"
+              decoding="sync"
               className="w-full h-full object-cover"
               style={{ transform: `translateY(${offset}px) scale(1.05)`, transition: "transform 0.1s linear" }}
             />
