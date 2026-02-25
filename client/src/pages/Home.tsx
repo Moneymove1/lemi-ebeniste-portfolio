@@ -436,21 +436,21 @@ function SectionCommercial() {
           </Reveal>
         </div>
 
-        {/* ── Row 2: Portrait (25%) + Portrait (25%) + Paysage (50%) ── */}
+        {/* ── Row 2: Portrait (25%) + Paysage (50%) + Portrait (25%) ── */}
         <div className="grid grid-cols-1 md:grid-cols-4" style={{ gap }}>
           <Reveal delay={100}>
             <div onClick={() => setLightboxIdx(3)} className="cursor-pointer h-full">
               <GalleryImage src={IMG.comm4} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
-          <Reveal delay={200}>
+          <Reveal delay={200} className="md:col-span-2">
             <div onClick={() => setLightboxIdx(4)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm6} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
+              <GalleryImage src={IMG.comm5} alt="Projet commercial" aspect="3/2" mobileAspect="4/3" className="h-full" />
             </div>
           </Reveal>
-          <Reveal delay={300} className="md:col-span-2">
+          <Reveal delay={300}>
             <div onClick={() => setLightboxIdx(5)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm5} alt="Projet commercial" aspect="3/2" mobileAspect="4/3" className="h-full" />
+              <GalleryImage src={IMG.comm6} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
         </div>
