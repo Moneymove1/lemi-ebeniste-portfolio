@@ -482,7 +482,7 @@ function SectionResidentiel() {
     IMG.res13, IMG.res14, IMG.res15,
     IMG.res16, IMG.res17,
     IMG.res18jpg, IMG.res18png, IMG.res19,
-    IMG.res20, IMG.res21,
+    IMG.res21,
     IMG.res22, IMG.res23,
   ];
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -586,16 +586,11 @@ function SectionResidentiel() {
           </Reveal>
         </div>
 
-        {/* ── Row 6: 2 photos: 40% - 60% ── */}
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] mb-3 md:mb-4" style={{ gap }}>
+        {/* ── Row 6: 1 photo pleine largeur ── */}
+        <div className="mb-3 md:mb-4">
           <Reveal>
             <div onClick={() => open(14)} className="cursor-pointer">
-              <GalleryImage src={IMG.res20} alt="Projet résidentiel" aspect="4/3" mobileAspect="4/3" />
-            </div>
-          </Reveal>
-          <Reveal delay={100}>
-            <div onClick={() => open(15)} className="cursor-pointer">
-              <GalleryImage src={IMG.res21} alt="Projet résidentiel" aspect="2/1" mobileAspect="4/3" />
+              <GalleryImage src={IMG.res21} alt="Projet résidentiel" aspect="21/9" mobileAspect="16/9" />
             </div>
           </Reveal>
         </div>
@@ -603,12 +598,12 @@ function SectionResidentiel() {
         {/* ── Row 7: 2 photos: Carré large - Portrait étroit ── */}
         <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr]" style={{ gap }}>
           <Reveal>
-            <div onClick={() => open(16)} className="cursor-pointer">
+            <div onClick={() => open(15)} className="cursor-pointer">
               <GalleryImage src={IMG.res22} alt="Projet résidentiel" aspect="4/3" mobileAspect="4/3" />
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div onClick={() => open(17)} className="cursor-pointer">
+            <div onClick={() => open(16)} className="cursor-pointer">
               <GalleryImage src={IMG.res23} alt="Projet résidentiel" aspect="2/3" mobileAspect="4/3" />
             </div>
           </Reveal>
@@ -640,7 +635,7 @@ const forces = [
   {
     num: "03",
     title: "TRAVAIL DE PRÉCISION ?",
-    text: "Tout est mis en œuvre pour garantir un travail de précision, soutenus par la dextérité acquise par les années d’expériences.\n\nLa prise de mesures est d’une importance capitale pour obtenir le résultat spécifique souhaité.\n\nPas de demi-mesure !",
+    text: "Tout est mis en œuvre pour garantir un travail de précision, soutenu par la dextérité acquise par les années d’expériences.\n\nLa prise de mesures est d’une importance capitale pour obtenir le résultat spécifique souhaité.\n\nPas de demi-mesure !",
   },
   {
     num: "04",
