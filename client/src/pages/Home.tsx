@@ -417,40 +417,40 @@ function SectionCommercial() {
 
       <div className="mx-auto" style={{ maxWidth: "1440px", padding: "0 clamp(24px, 4vw, 64px)" }}>
 
-        {/* ── Row 1: Paysage (50%) + Portrait (25%) + Portrait (25%) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-4 mb-3 md:mb-4" style={{ gap }}>
-          <Reveal className="md:col-span-2">
+        {/* ── Row 1: 3 Portraits Verticaux (1/3 chacun) ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 mb-3 md:mb-4" style={{ gap }}>
+          <Reveal>
             <div onClick={() => setLightboxIdx(0)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm1} alt="Projet commercial lunetterie" aspect="4/3" mobileAspect="4/3" className="h-full" />
+              <GalleryImage src={IMG.comm1} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
           <Reveal delay={100}>
             <div onClick={() => setLightboxIdx(1)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm2} alt="Projet commercial lunetterie" aspect="2/3" mobileAspect="4/5" className="h-full" />
+              <GalleryImage src={IMG.comm2} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
           <Reveal delay={200}>
             <div onClick={() => setLightboxIdx(2)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm3} alt="Projet commercial lunetterie" aspect="2/3" mobileAspect="4/5" className="h-full" />
+              <GalleryImage src={IMG.comm3} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
         </div>
 
-        {/* ── Row 2: Portrait (25%) + Paysage (50%) + Portrait (25%) ── */}
+        {/* ── Row 2: Portrait (25%) + Portrait (25%) + Paysage (50%) ── */}
         <div className="grid grid-cols-1 md:grid-cols-4" style={{ gap }}>
           <Reveal delay={100}>
             <div onClick={() => setLightboxIdx(3)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm4} alt="Projet commercial lunetterie" aspect="2/3" mobileAspect="4/5" className="h-full" />
+              <GalleryImage src={IMG.comm4} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
-          <Reveal delay={200} className="md:col-span-2">
+          <Reveal delay={200}>
             <div onClick={() => setLightboxIdx(4)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm5} alt="Projet commercial lunetterie" aspect="4/3" mobileAspect="4/3" className="h-full" />
+              <GalleryImage src={IMG.comm6} alt="Projet commercial" aspect="3/4" mobileAspect="4/5" className="h-full" />
             </div>
           </Reveal>
-          <Reveal delay={300}>
+          <Reveal delay={300} className="md:col-span-2">
             <div onClick={() => setLightboxIdx(5)} className="cursor-pointer h-full">
-              <GalleryImage src={IMG.comm6} alt="Projet commercial lunetterie" aspect="2/3" mobileAspect="4/5" className="h-full" />
+              <GalleryImage src={IMG.comm5} alt="Projet commercial" aspect="3/2" mobileAspect="4/3" className="h-full" />
             </div>
           </Reveal>
         </div>
