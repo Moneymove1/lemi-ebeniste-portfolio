@@ -29,7 +29,7 @@ const C = {
 // ─── Local Images ────────────────────────────────────────────────
 const IMG = {
   // Hero
-  cuisineGrise: "/portfolio/1111.webp",
+  cuisineGrise: "/portfolio/hero_kitchen.webp",
 
   // ── COMMERCIAL ──
   comm1: "/portfolio/c1.webp",
@@ -331,7 +331,7 @@ function Hero() {
     <section style={{ backgroundColor: C.ivory, paddingTop: "80px" }}>
       <div className="mx-auto" style={{ maxWidth: "1440px", padding: "clamp(12px, 3vw, 40px) clamp(16px, 4vw, 64px)" }}>
         <div className="relative overflow-hidden" style={{ backgroundColor: C.lineLight }}>
-          <div className="overflow-hidden" style={{ height: "clamp(300px, 55vh, 720px)" }}>
+          <div className="overflow-hidden" style={{ height: "clamp(250px, 40vh, 550px)" }}>
             <img
               src={IMG.cuisineGrise}
               alt="Cuisine sur mesure — Maître Ébéniste"
