@@ -29,7 +29,7 @@ const C = {
 // ─── Local Images ────────────────────────────────────────────────
 const IMG = {
   // Hero
-  cuisineGrise: "/portfolio/hero_kitchen.webp",
+  cuisineGrise: "/portfolio/hero_main.webp",
 
   // ── COMMERCIAL ──
   comm1: "/portfolio/c1.webp",
