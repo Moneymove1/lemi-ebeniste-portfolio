@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, type ReactNode } from "react";
+import { useEffect, useRef, useState, useCallback, type ReactNode, type FormEvent, type ChangeEvent } from "react";
 import { Link } from "wouter";
 
 /*
@@ -759,88 +759,505 @@ function SectionForces() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CONTACT — Elegant CTA — Address: 36-999 rue du Collège
+   CONTACT FORM — Submission form component
+   ══════════════════════════════════════════════════════════════ */
+const PROJECT_TYPES = [
+  "Cuisine sur mesure",
+  "Garde-robe / Walk-in",
+  "Salle de bain",
+  "Mobilier sur mesure",
+  "Aménagement commercial",
+  "Rénovation complète",
+  "Autre",
+];
+
+const BUDGET_RANGES = [
+  "Moins de 10 000 $",
+  "10 000 $ — 25 000 $",
+  "25 000 $ — 50 000 $",
+  "50 000 $ — 100 000 $",
+  "100 000 $ +",
+  "À déterminer",
+];
+
+const inputStyle: React.CSSProperties = {
+  fontFamily: "'DM Sans', system-ui, sans-serif",
+  fontSize: "0.9rem",
+  fontWeight: 400,
+  color: "#1C1C1C",
+  backgroundColor: "#FFFFFF",
+  border: "1px solid #E5E1DA",
+  borderRadius: "4px",
+  padding: "12px 14px",
+  width: "100%",
+  outline: "none",
+  transition: "border-color 0.3s ease",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: "'DM Sans', system-ui, sans-serif",
+  fontSize: "0.7rem",
+  fontWeight: 600,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "#7A756D",
+  marginBottom: "8px",
+  display: "block",
+};
+
+function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    projectType: "",
+    budget: "",
+    comments: "",
+  });
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setPhotos((prev) => [...prev, ...newFiles].slice(0, 5)); // max 5 photos
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMsg("");
+
+    try {
+      // Convert photos to base64 data URLs for sending
+      const photoPromises = photos.map(
+        (file) =>
+          new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(file);
+          })
+      );
+      const photoDataUrls = await Promise.all(photoPromises);
+
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          photos: photoDataUrls,
+        }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ name: "", phone: "", email: "", projectType: "", budget: "", comments: "" });
+        setPhotos([]);
+      } else {
+        const data = await response.json();
+        setErrorMsg(data.error || "Erreur lors de l'envoi.");
+        setStatus("error");
+      }
+    } catch {
+      setErrorMsg("Erreur de connexion. Veuillez réessayer.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <div style={{ textAlign: "center", padding: "2rem 0" }}>
+        <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>&#10003;</div>
+        <h3 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "1.6rem", fontWeight: 300, fontStyle: "italic", color: "#1C1C1C", marginBottom: "0.8rem" }}>
+          Merci pour votre demande!
+        </h3>
+        <p style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "0.9rem", color: "#7A756D", lineHeight: 1.6 }}>
+          Nous avons bien reçu votre soumission et vous contacterons dans les plus brefs délais.
+        </p>
+        <button
+          onClick={() => setStatus("idle")}
+          style={{
+            marginTop: "1.5rem",
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#7A756D",
+            background: "none",
+            border: `1px solid #E5E1DA`,
+            borderRadius: "4px",
+            padding: "10px 24px",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#1C1C1C"; e.currentTarget.style.color = "#1C1C1C"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E5E1DA"; e.currentTarget.style.color = "#7A756D"; }}
+        >
+          Envoyer une autre demande
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+      {/* Name */}
+      <div>
+        <label style={labelStyle}>Nom complet *</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          placeholder="Votre nom complet"
+          style={inputStyle}
+          onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1C1C")}
+          onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E1DA")}
+        />
+      </div>
+
+      {/* Phone + Email row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: "1.2rem" }}>
+        <div>
+          <label style={labelStyle}>Téléphone</label>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="514-000-0000"
+            style={inputStyle}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1C1C")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E1DA")}
+          />
+        </div>
+        <div>
+          <label style={labelStyle}>Courriel *</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="votre@courriel.com"
+            style={inputStyle}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1C1C")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E1DA")}
+          />
+        </div>
+      </div>
+
+      {/* Project Type + Budget row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: "1.2rem" }}>
+        <div>
+          <label style={labelStyle}>Type de projet</label>
+          <select
+            name="projectType"
+            value={formData.projectType}
+            onChange={handleChange}
+            style={{ ...inputStyle, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A756D' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center", paddingRight: "36px" }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1C1C")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E1DA")}
+          >
+            <option value="">Sélectionnez...</option>
+            {PROJECT_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label style={labelStyle}>Budget estimé</label>
+          <select
+            name="budget"
+            value={formData.budget}
+            onChange={handleChange}
+            style={{ ...inputStyle, appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A756D' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center", paddingRight: "36px" }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1C1C")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E1DA")}
+          >
+            <option value="">Sélectionnez...</option>
+            {BUDGET_RANGES.map((b) => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Photos */}
+      <div>
+        <label style={labelStyle}>Photos (optionnel, max 5)</label>
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          style={{
+            border: `2px dashed ${C.line}`,
+            borderRadius: "4px",
+            padding: "1.2rem",
+            textAlign: "center",
+            cursor: "pointer",
+            transition: "border-color 0.3s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.mid)}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.line)}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={C.light} strokeWidth="1.5" style={{ margin: "0 auto 8px" }}>
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+          </svg>
+          <p style={{ fontFamily: sans, fontSize: "0.85rem", color: C.mid }}>
+            Cliquez pour ajouter des photos
+          </p>
+          <p style={{ fontFamily: sans, fontSize: "0.72rem", color: C.light, marginTop: "4px" }}>
+            JPG, PNG, WEBP — max 5 fichiers
+          </p>
+        </div>
+        {photos.length > 0 && (
+          <div style={{ display: "flex", gap: "8px", marginTop: "10px", flexWrap: "wrap" }}>
+            {photos.map((file, i) => (
+              <div key={i} style={{ position: "relative", width: "64px", height: "64px", borderRadius: "4px", overflow: "hidden", border: `1px solid ${C.line}` }}>
+                <img src={URL.createObjectURL(file)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  style={{
+                    position: "absolute",
+                    top: "2px",
+                    right: "2px",
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    backgroundColor: "rgba(28,28,28,0.7)",
+                    color: "#fff",
+                    border: "none",
+                    fontSize: "10px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 1,
+                  }}
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Comments */}
+      <div>
+        <label style={labelStyle}>Commentaires</label>
+        <textarea
+          name="comments"
+          value={formData.comments}
+          onChange={handleChange}
+          rows={4}
+          placeholder="Décrivez votre projet, vos besoins, dimensions, etc."
+          style={{ ...inputStyle, resize: "vertical", minHeight: "100px" }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1C1C")}
+          onBlur={(e) => (e.currentTarget.style.borderColor = "#E5E1DA")}
+        />
+      </div>
+
+      {/* Error message */}
+      {status === "error" && (
+        <p style={{ fontFamily: sans, fontSize: "0.85rem", color: "#c0392b", margin: 0 }}>
+          {errorMsg}
+        </p>
+      )}
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        style={{
+          fontFamily: sans,
+          fontSize: "0.78rem",
+          fontWeight: 600,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          color: "#FFFFFF",
+          backgroundColor: C.charcoal,
+          border: "none",
+          borderRadius: "4px",
+          padding: "14px 32px",
+          cursor: status === "sending" ? "wait" : "pointer",
+          transition: "background-color 0.3s ease, opacity 0.3s ease",
+          opacity: status === "sending" ? 0.7 : 1,
+          width: "100%",
+        }}
+        onMouseEnter={(e) => { if (status !== "sending") e.currentTarget.style.backgroundColor = "#2A2825"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#1C1C1C"; }}
+      >
+        {status === "sending" ? "Envoi en cours..." : "Envoyer la demande"}
+      </button>
+    </form>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONTACT — Elegant CTA + Submission Form — Address: 36-999 rue du Collège
    ══════════════════════════════════════════════════════════════ */
 function SectionContact() {
   return (
     <section id="contact" style={{ backgroundColor: C.ivory, padding: "clamp(3rem, 6vw, 5rem) 0 clamp(4rem, 8vw, 7rem)" }}>
-      <div className="mx-auto" style={{ maxWidth: "900px", padding: "0 clamp(24px, 4vw, 64px)" }}>
-        <Reveal>
-          <p style={{
-            fontFamily: sans,
-            fontSize: "0.7rem",
-            fontWeight: 600,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase" as const,
-            color: C.light,
-            marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
-          }}>
-            Contact
-          </p>
-        </Reveal>
+      <div className="mx-auto" style={{ maxWidth: "1200px", padding: "0 clamp(24px, 4vw, 64px)" }}>
+        
+        {/* Two-column layout: Left = CTA info, Right = Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-2" style={{ gap: "clamp(3rem, 6vw, 5rem)", alignItems: "start" }}>
+          
+          {/* ── LEFT COLUMN: Existing contact info ── */}
+          <div>
+            <Reveal>
+              <p style={{
+                fontFamily: sans,
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase" as const,
+                color: C.light,
+                marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
+              }}>
+                Contact
+              </p>
+            </Reveal>
 
-        <Reveal delay={100}>
-          <h2 style={{
-            fontFamily: serif,
-            fontSize: "clamp(2.2rem, 5vw, 4rem)",
-            fontWeight: 300,
-            fontStyle: "italic",
-            color: C.charcoal,
-            lineHeight: 1.15,
-            marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
-          }}>
-            Vous avez un projet<br />en tête?
-          </h2>
-        </Reveal>
+            <Reveal delay={100}>
+              <h2 style={{
+                fontFamily: serif,
+                fontSize: "clamp(2.2rem, 5vw, 4rem)",
+                fontWeight: 300,
+                fontStyle: "italic",
+                color: C.charcoal,
+                lineHeight: 1.15,
+                marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
+              }}>
+                Vous avez un projet<br />en tête?
+              </h2>
+            </Reveal>
 
-        <Reveal delay={200}>
-          <a
-            href="tel:5148673492"
-            className="inline-block group"
-            style={{ textDecoration: "none", marginBottom: "clamp(2.5rem, 5vw, 4rem)" }}
-          >
-            <span style={{
-              fontFamily: sans,
-              fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)",
-              fontWeight: 600,
-              color: C.charcoal,
-              borderBottom: `2px solid ${C.charcoal}`,
-              paddingBottom: "6px",
-              transition: "border-color 0.3s ease, color 0.3s ease",
-            }}>
-              514-867-3492
-            </span>
-          </a>
-        </Reveal>
+            <Reveal delay={200}>
+              <a
+                href="tel:5148673492"
+                className="inline-block group"
+                style={{ textDecoration: "none", marginBottom: "clamp(2.5rem, 5vw, 4rem)" }}
+              >
+                <span style={{
+                  fontFamily: sans,
+                  fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)",
+                  fontWeight: 600,
+                  color: C.charcoal,
+                  borderBottom: `2px solid ${C.charcoal}`,
+                  paddingBottom: "6px",
+                  transition: "border-color 0.3s ease, color 0.3s ease",
+                }}>
+                  514-867-3492
+                </span>
+              </a>
+            </Reveal>
 
-        <Reveal delay={300}>
-          <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: "clamp(1.5rem, 3vw, 2.5rem)", borderTop: `1px solid ${C.line}`, paddingTop: "clamp(1.5rem, 3vw, 2.5rem)" }}>
-            <div>
-              <p style={{ fontFamily: sans, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, color: C.light, marginBottom: "10px" }}>
-                Atelier
-              </p>
-              <p style={{ fontFamily: sans, fontSize: "0.92rem", fontWeight: 500, color: C.dark, lineHeight: 1.6 }}>
-                36-999 rue du Collège<br />Montréal
-              </p>
-            </div>
-            <div>
-              <p style={{ fontFamily: sans, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, color: C.light, marginBottom: "10px" }}>
-                Services
-              </p>
-              <p style={{ fontFamily: sans, fontSize: "0.92rem", fontWeight: 500, color: C.dark, lineHeight: 1.6 }}>
-                Résidentiel & Commercial<br />Particuliers, architectes & designers
-              </p>
-            </div>
-            <div>
-              <p style={{ fontFamily: sans, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, color: C.light, marginBottom: "10px" }}>
-                Note
-              </p>
-              <p style={{ fontFamily: sans, fontSize: "0.92rem", fontWeight: 500, color: C.dark, lineHeight: 1.6 }}>
-                Tarifs préférentiels<br />pour les membres de l'UDA
-              </p>
-            </div>
+            <Reveal delay={250}>
+              <a
+                href="mailto:michel@maitre-ebeniste.com"
+                className="inline-block"
+                style={{
+                  display: "block",
+                  fontFamily: sans,
+                  fontSize: "0.92rem",
+                  fontWeight: 500,
+                  color: C.mid,
+                  textDecoration: "none",
+                  marginBottom: "clamp(2rem, 4vw, 3rem)",
+                  transition: "color 0.3s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = C.charcoal)}
+                onMouseLeave={(e) => (e.currentTarget.style.color = C.mid)}
+              >
+                michel@maitre-ebeniste.com
+              </a>
+            </Reveal>
+
+            <Reveal delay={300}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "clamp(1.5rem, 3vw, 2rem)", borderTop: `1px solid ${C.line}`, paddingTop: "clamp(1.5rem, 3vw, 2.5rem)" }}>
+                <div>
+                  <p style={{ fontFamily: sans, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, color: C.light, marginBottom: "10px" }}>
+                    Atelier
+                  </p>
+                  <p style={{ fontFamily: sans, fontSize: "0.92rem", fontWeight: 500, color: C.dark, lineHeight: 1.6 }}>
+                    36-999 rue du Collège<br />Montréal
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontFamily: sans, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, color: C.light, marginBottom: "10px" }}>
+                    Services
+                  </p>
+                  <p style={{ fontFamily: sans, fontSize: "0.92rem", fontWeight: 500, color: C.dark, lineHeight: 1.6 }}>
+                    Résidentiel & Commercial<br />Particuliers, architectes & designers
+                  </p>
+                </div>
+                <div>
+                  <p style={{ fontFamily: sans, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, color: C.light, marginBottom: "10px" }}>
+                    Note
+                  </p>
+                  <p style={{ fontFamily: sans, fontSize: "0.92rem", fontWeight: 500, color: C.dark, lineHeight: 1.6 }}>
+                    Tarifs préférentiels<br />pour les membres de l'UDA
+                  </p>
+                </div>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+
+          {/* ── RIGHT COLUMN: Contact Form ── */}
+          <Reveal delay={200}>
+            <div style={{
+              backgroundColor: C.white,
+              borderRadius: "8px",
+              padding: "clamp(1.5rem, 3vw, 2.5rem)",
+              border: `1px solid ${C.lineLight}`,
+            }}>
+              <h3 style={{
+                fontFamily: serif,
+                fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)",
+                fontWeight: 300,
+                fontStyle: "italic",
+                color: C.charcoal,
+                marginBottom: "0.5rem",
+              }}>
+                Demande de soumission
+              </h3>
+              <p style={{
+                fontFamily: sans,
+                fontSize: "0.82rem",
+                color: C.mid,
+                marginBottom: "1.5rem",
+                lineHeight: 1.5,
+              }}>
+                Remplissez le formulaire et nous vous contacterons rapidement.
+              </p>
+              <ContactForm />
+            </div>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

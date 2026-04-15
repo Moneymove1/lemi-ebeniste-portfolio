@@ -1,0 +1,25 @@
+Project Analysis Notes:
+========================
+
+Stack: Vite + React + TypeScript + TailwindCSS + Express
+Deployed on: Vercel (maitre-ebeniste-portfolio.vercel.app, custom domain: maitre-ebeniste.com)
+
+Contact Section (SectionContact in Home.tsx, lines 764-846):
+- Currently shows: "Contact" label, "Vous avez un projet en tête?", phone number 514-867-3492
+- Below: 3 columns (Atelier address, Services, Note UDA)
+- maxWidth: 900px
+- Design tokens: sans = DM Sans, serif = Cormorant Garamond
+- Colors: C.ivory (#F5F3EE), C.charcoal (#1C1C1C), C.mid (#7A756D), etc.
+
+Server: Express, serves static files. No API routes yet.
+Need to add: POST /api/contact endpoint for form submission.
+
+Plan:
+1. Modify SectionContact to be a 2-column layout:
+   - Left: existing "Vous avez un projet en tête?" + phone
+   - Right: Contact form (name, phone, email, project type dropdown, budget, photos, comments, send button)
+2. Add API route in server/index.ts to handle form submission
+3. Use SendGrid (already have API key) or nodemailer to send to michel@maitre-ebeniste.com
+4. For file uploads on Vercel serverless, need to handle multipart/form-data
+
+Key: Must use the same design language (DM Sans, Cormorant Garamond, ivory/charcoal palette)
