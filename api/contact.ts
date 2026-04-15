@@ -7,7 +7,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "";
 const TO_EMAIL = "michel@maitre-ebeniste.com";
-const FROM_EMAIL = "michel@maitre-ebeniste.com";
+const FROM_EMAIL = "noreply@maitre-ebeniste.com";
 
 function parseBody(req: IncomingMessage): Promise<any> {
   return new Promise((resolve, reject) => {
