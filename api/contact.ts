@@ -1,4 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { IncomingMessage, ServerResponse } from "http";
 
 /**
  * Vercel Serverless Function — Contact Form Handler
@@ -9,26 +9,46 @@ const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "";
 const TO_EMAIL = "michel@maitre-ebeniste.com";
 const FROM_EMAIL = "noreply@maitre-ebeniste.com";
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+function parseBody(req: IncomingMessage): Promise<any> {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+    req.on("end", () => {
+      try { resolve(JSON.parse(body)); }
+      catch { reject(new Error("Invalid JSON")); }
+    });
+    req.on("error", reject);
+  });
+}
+
+export default async function handler(req: IncomingMessage, res: ServerResponse) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    res.statusCode = 200;
+    res.end();
+    return;
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    res.statusCode = 405;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ error: "Method not allowed" }));
+    return;
   }
 
   try {
-    const { name, phone, email, projectType, budget, comments, photos } = req.body;
+    const { name, phone, email, projectType, budget, comments, photos } = await parseBody(req);
 
     // Validate required fields
     if (!name || !email) {
-      return res.status(400).json({ error: "Nom et courriel sont requis." });
+      res.statusCode = 400;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify({ error: "Nom et courriel sont requis." }));
+      return;
     }
 
     // Build email HTML
@@ -101,14 +121,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (sgResponse.ok || sgResponse.status === 202) {
-      return res.status(200).json({ success: true, message: "Votre demande a été envoyée avec succès!" });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify({ success: true, message: "Votre demande a été envoyée avec succès!" }));
     } else {
       const errorText = await sgResponse.text();
       console.error("SendGrid error:", sgResponse.status, errorText);
-      return res.status(500).json({ error: "Erreur lors de l'envoi. Veuillez réessayer." });
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify({ error: "Erreur lors de l'envoi. Veuillez réessayer." }));
     }
   } catch (error) {
     console.error("Contact form error:", error);
-    return res.status(500).json({ error: "Erreur serveur. Veuillez réessayer." });
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ error: "Erreur serveur. Veuillez réessayer." }));
   }
 }
