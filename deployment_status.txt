@@ -1,0 +1,9 @@
+Deployment Status:
+- Status: Ready (green)
+- Commit: 528dfa5 "Add contact submission form with SendGrid email integration"
+- Deployed 1m ago
+- Domains: maitre-ebeniste.com, maitre-ebeniste-portfolio.vercel.app
+- Function Invocations: 0
+- Error Rate: 0%
+
+IMPORTANT: Need to add SENDGRID_API_KEY environment variable in Vercel for the API route to work.

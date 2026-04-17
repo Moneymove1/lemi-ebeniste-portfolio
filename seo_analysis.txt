@@ -1,0 +1,49 @@
+SEO ANALYSIS - maitre-ebeniste.com
+===================================
+
+CURRENT STATE (PROBLEMS):
+1. NO meta description tag
+2. NO Open Graph tags (og:title, og:description, og:image)
+3. NO Twitter Card tags
+4. NO canonical URL
+5. NO robots.txt
+6. NO sitemap.xml
+7. NO structured data (JSON-LD schema)
+8. NO alt text on images (or minimal)
+9. Title is generic: "Maître Ébéniste — Montréal" - needs keywords
+10. Single Page App (SPA) - Google may have trouble indexing content
+11. NO semantic HTML headings strategy (h1, h2, h3)
+
+TARGET KEYWORDS (French - Montreal market):
+Primary:
+- ébéniste montréal
+- cuisine sur mesure montréal
+- armoires sur mesure montréal
+- ébénisterie montréal
+
+Secondary:
+- fabricant armoires cuisine montréal
+- walk-in sur mesure montréal
+- garde-robe intégrée montréal
+- meuble sur mesure montréal
+- salle de bain sur mesure montréal
+- ébéniste résidentiel commercial montréal
+- cuisine haut de gamme montréal
+- armoires laque acrylique montréal
+
+Long-tail:
+- ébéniste cuisine sur mesure laval rive-sud
+- fabrication directe armoires montréal
+- ébéniste 30 ans expérience montréal
+
+FIXES TO IMPLEMENT:
+1. Optimized title tag with keywords
+2. Meta description with call to action
+3. Open Graph + Twitter Card tags
+4. Canonical URL
+5. robots.txt
+6. sitemap.xml
+7. JSON-LD structured data (LocalBusiness + Service)
+8. Alt text on all images
+9. Semantic headings (h1, h2, h3)
+10. Internal linking strategy
