@@ -861,6 +861,10 @@ function ContactForm() {
       });
 
       if (response.ok) {
+        // Meta Pixel: Track Lead event on successful form submission
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+          (window as any).fbq('track', 'Lead');
+        }
         setStatus("success");
         setFormData({ name: "", phone: "", email: "", projectType: "", budget: "", comments: "" });
         setPhotos([]);
