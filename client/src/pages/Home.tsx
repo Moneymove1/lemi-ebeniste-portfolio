@@ -862,8 +862,20 @@ function ContactForm() {
 
       if (response.ok) {
         // Meta Pixel: Track Lead event on successful form submission
-        if (typeof window !== 'undefined' && (window as any).fbq) {
-          (window as any).fbq('track', 'Lead');
+        try {
+          if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
+            (window as any).fbq('track', 'Lead', {
+              content_name: 'Demande de soumission',
+              content_category: formData.projectType || 'Non spécifié',
+              value: 0,
+              currency: 'CAD'
+            });
+            console.log('[Meta Pixel] Lead event fired successfully');
+          } else {
+            console.warn('[Meta Pixel] fbq not available');
+          }
+        } catch (err) {
+          console.error('[Meta Pixel] Error firing Lead event:', err);
         }
         setStatus("success");
         setFormData({ name: "", phone: "", email: "", projectType: "", budget: "", comments: "" });
